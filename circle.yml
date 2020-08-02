@@ -1,0 +1,41 @@
+machine:
+dependencies:
+    # Descargamos cocoapods desde S3
+https://cocoapods-specs.circleci.com/fetch-cocoapods-repo-from-s3.sh
+ xcode:
+ | bash
+version: 9.0.1
+ cache_directories:
+ - ~/.npm
+ - ~/Library/Caches/Homebrew
+ - ~/Library/Caches/CocoaPods
+ pre:
+ - curl -sS
+  - npm i -g nativescript --ignore-scripts
+ override:
+# Iniciamos el emulador
+compile:
+override:
+# Compilar
+test:
+override: # E2E
+"iPhone 7 (11.0.1) [":
+   "ios prepare"
+- npm set progress=false && npm install
+ post:
+ - xcrun instruments -w
+ background: true
+ - tns prepare ios || echo
+ - tns build ios
+ - npm run e2e -- --runType sim.iPhone7
+ post:
+ 
+# exporter los resultados para poder ser descargados
+- mv e2e/reports/**/* $CIRCLE_ARTIFACTS/
+general:
+          # listado de branches a observar y compilar cuando hay pushes
+
+ only:
+ - master
+ - develop
+ 
